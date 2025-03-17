@@ -47,21 +47,25 @@ from elevenlabs import ElevenLabs
 def text_to_speech(text):
     try:
         elevenlabs = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-        audio = elevenlabs.text_to_speech.convert(
+        audio_stream = elevenlabs.text_to_speech.convert(
             text=text,
             voice_id="UR972wNGq3zluze0LoIp"  # ✅ صوت اللهجة المصرية
         )
 
+        # 🔹 تحويل الـ Generator إلى Bytes
+        audio_data = b"".join(audio_stream)
+
         # 🔹 حفظ الصوت وتشغيله
         file_path = "output.mp3"
         with open(file_path, "wb") as f:
-            f.write(audio)
+            f.write(audio_data)
 
         sound = AudioSegment.from_file(file_path, format="mp3")
         play(sound)
 
     except Exception as e:
         print(f"❌ خطأ في تحويل النص إلى صوت: {e}")
+
 
 
 
