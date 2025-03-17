@@ -1,6 +1,6 @@
 import os
 import json
-from mistralai.client import MistralClient  # ✅ استيراد الكود بالطريقة الصحيحة
+import requests  # استيراد requests لاستخدام API مباشرة
 from elevenlabs.client import ElevenLabs
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
@@ -22,12 +22,24 @@ db = firestore.client()
 
 # ✅ استدعاء Mistral API للرد على المستخدم
 def get_ai_response(user_input):
-    client = MistralClient(api_key=MISTRAL_API_KEY)  # ✅ استخدام `MistralClient` بدلًا من `Mistral`
-    response = client.chat(
-        model="mistral-tiny",
-        messages=[{"role": "user", "content": user_input}]
-    )
-    return response.choices[0].message.content
+    api_url = "https://api.mistral.ai/v1/chat/completions"  # ✅ العنوان الصحيح لـ API
+    headers = {
+        "Authorization": f"Bearer {MISTRAL_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "mistral-tiny",
+        "messages": [{"role": "user", "content": user_input}]
+    }
+
+    response = requests.post(api_url, headers=headers, json=payload)
+    
+    if response.status_code == 200:
+        return response.json()["choices"][0]["message"]["content"]
+    else:
+        print(f"❌ خطأ في Mistral API: {response.text}")
+        return "عذرًا، حدث خطأ أثناء معالجة طلبك."
+
 
 # ✅ تحويل النص إلى صوت باستخدام ElevenLabs
 def text_to_speech(text):
