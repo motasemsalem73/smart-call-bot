@@ -1,8 +1,9 @@
 import os
+import json
 import speech_recognition as sr
 from mistralai.client import MistralClient
 from mistralai.models.chat_completion import ChatMessage
-from elevenlabs import play, stream, generate
+from elevenlabs import play, generate, stream
 from firebase_admin import credentials, firestore, initialize_app
 
 # ✅ تحميل مفاتيح API من المتغيرات البيئية
@@ -10,10 +11,14 @@ MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
 
 # ✅ إعداد Firebase
-firebase_credentials = os.getenv("FIREBASE_CREDENTIALS_JSON")
-cred = credentials.Certificate(firebase_credentials)
-initialize_app(cred)
-db = firestore.client()
+firebase_credentials_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+if firebase_credentials_json:
+    firebase_credentials = json.loads(firebase_credentials_json)
+    cred = credentials.Certificate(firebase_credentials)
+    initialize_app(cred)
+    db = firestore.client()
+else:
+    print("⚠️ تحذير: لم يتم العثور على بيانات اعتماد Firebase!")
 
 # ✅ إعداد المايكروفون والتعرف على الصوت
 recognizer = sr.Recognizer()
@@ -42,20 +47,30 @@ def listen():
 
 # ✅ دالة الحصول على رد الذكاء الاصطناعي
 def get_ai_response(user_input):
-    messages = [ChatMessage(role="user", content=user_input)]
-    response = mistral_client.chat(model="mistral-tiny", messages=messages)
-    return response.choices[0].message.content
+    try:
+        messages = [ChatMessage(role="user", content=user_input)]
+        response = mistral_client.chat(model="mistral-tiny", messages=messages)
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"⚠️ خطأ في Mistral AI: {e}")
+        return "عذرًا، حدث خطأ أثناء معالجة الطلب."
 
 # ✅ دالة التحدث بالصوت الفوري
 def speak(text):
-    print(f"🗣️ الرد: {text}")
-    audio_stream = generate(text=text, voice="newscaster", stream=True, api_key=ELEVENLABS_API_KEY)
-    stream(audio_stream)
+    try:
+        print(f"🗣️ الرد: {text}")
+        audio_stream = generate(text=text, voice="newscaster", stream=True, api_key=ELEVENLABS_API_KEY)
+        stream(audio_stream)
+    except Exception as e:
+        print(f"❌ خطأ في تحويل النص إلى صوت: {e}")
 
 # ✅ تشغيل البوت
 if __name__ == "__main__":
     while True:
         user_input = listen()
         if user_input:
+            if user_input.lower() in ["خروج", "انهاء"]:
+                print("👋 إنهاء البرنامج...")
+                break
             response = get_ai_response(user_input)
             speak(response)
