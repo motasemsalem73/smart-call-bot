@@ -1,7 +1,6 @@
 import os
 import json
-from mistralai.client import MistralClient
-from mistralai.models.chat_completion import ChatMessage
+from mistralai.client import MistralClient  # ✅ استيراد الكود بالطريقة الصحيحة
 from elevenlabs.client import ElevenLabs
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
@@ -23,10 +22,10 @@ db = firestore.client()
 
 # ✅ استدعاء Mistral API للرد على المستخدم
 def get_ai_response(user_input):
-    client = MistralClient(api_key=MISTRAL_API_KEY)
+    client = MistralClient(api_key=MISTRAL_API_KEY)  # ✅ استخدام `MistralClient` بدلًا من `Mistral`
     response = client.chat(
         model="mistral-tiny",
-        messages=[ChatMessage(role="user", content=user_input)]
+        messages=[{"role": "user", "content": user_input}]
     )
     return response.choices[0].message.content
 

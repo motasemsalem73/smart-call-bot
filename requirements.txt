@@ -1,4 +1,4 @@
-mistralai
+mistralai>=0.4.2
 firebase-admin
 twilio
 pydub
