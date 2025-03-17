@@ -23,14 +23,13 @@ db = firestore.client()
 
 # ✅ استدعاء Mistral API للرد على المستخدم
 def get_ai_response(user_input):
-    try:
-        client = MistralClient(api_key=MISTRAL_API_KEY)
-        messages = [ChatMessage(role="user", content=user_input)]
-        response = client.chat(model="mistral-large", messages=messages)
-        return response.choices[0].message.content
-    except Exception as e:
-        print(f"❌ خطأ في استدعاء Mistral API: {e}")
-        return "عذرًا، حدث خطأ أثناء معالجة طلبك."
+    client = MistralClient(api_key=os.getenv("MISTRAL_API_KEY"))
+    response = client.chat(
+        model="mistral-tiny",
+        messages=[{"role": "user", "content": user_input}]
+    )
+    return response['choices'][0]['message']['content']
+
 
 # ✅ تحويل النص إلى صوت باستخدام ElevenLabs
 def text_to_speech(text):
