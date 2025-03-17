@@ -1,7 +1,6 @@
 import os
 import json
 from mistralai.client import MistralClient
-from mistralai.models.chat_completion import ChatMessage
 from elevenlabs.client import ElevenLabs
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
