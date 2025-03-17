@@ -2,5 +2,5 @@ mistralai>=0.4.2
 firebase-admin
 twilio
 pydub
-elevenlabs
+elevenlabs==1.54.0
 requests
