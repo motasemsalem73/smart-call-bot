@@ -4,3 +4,4 @@ twilio
 pydub
 elevenlabs
 python-dateutil
+mistralai
