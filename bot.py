@@ -1,7 +1,7 @@
 import os
 import json
 import requests  # استيراد requests لاستخدام API مباشرة
-from elevenlabs import generate, play
+from elevenlabs import ElevenLabs
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
 from pydub import AudioSegment
@@ -52,7 +52,7 @@ def text_to_speech(text):
             voice_id="UR972wNGq3zluze0LoIp"  # ✅ صوت اللهجة المصرية
         )
 
-        # 🔹 حفظ وتشغيل الصوت
+        # 🔹 حفظ الصوت وتشغيله
         file_path = "output.mp3"
         with open(file_path, "wb") as f:
             f.write(audio)
