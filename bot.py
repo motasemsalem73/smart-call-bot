@@ -1,48 +1,73 @@
-import openai
-from elevenlabs import generate, play
-from twilio.rest import Client
-import firebase_admin
-from firebase_admin import credentials, firestore
 import os
+import openai
+from elevenlabs import Voice, VoiceSettings, generate
+from twilio.rest import Client
+from firebase_admin import credentials, firestore, initialize_app
+from pydub import AudioSegment
+from pydub.playback import play
 
-# قراءة مفاتيح API من المتغيرات البيئية
-openai.api_key = os.getenv("OPENAI_API_KEY")
-elevenlabs_api_key = os.getenv("ELEVENLABS_API_KEY")
-twilio_sid = os.getenv("TWILIO_ACCOUNT_SID")
-twilio_token = os.getenv("TWILIO_AUTH_TOKEN")
-twilio_phone = os.getenv("TWILIO_PHONE_NUMBER")
+# ✅ قراءة مفاتيح API من المتغيرات البيئية
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+TWILIO_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE = os.getenv("TWILIO_PHONE_NUMBER")
 
-# إعداد Firebase
+# ✅ إعداد Firebase
 cred = credentials.Certificate("firebase_credentials.json")
-firebase_admin.initialize_app(cred)
+initialize_app(cred)
 db = firestore.client()
 
-# استدعاء GPT-4
+# ✅ دالة استدعاء GPT-4 للرد على المستخدم
 def get_ai_response(user_input):
     response = openai.ChatCompletion.create(
         model="gpt-4-turbo",
-        messages=[{"role": "user", "content": user_input}]
+        messages=[{"role": "user", "content": user_input}],
+        api_key=OPENAI_API_KEY
     )
     return response["choices"][0]["message"]["content"]
 
-# تحويل النص إلى صوت
+# ✅ دالة تحويل النص إلى صوت باستخدام ElevenLabs
 def text_to_speech(text):
-    audio = generate(text=text, voice="Adam", api_key=elevenlabs_api_key)
-    play(audio)
+    try:
+        # 🔹 توليد الصوت باستخدام الصوت المصري الذي اخترته
+        audio_data = generate(
+            text=text,
+            voice=Voice(
+                voice_id="UR972wNGq3zluze0LoIp",  # استبدل بـ ID الصوت المصري من موقع ElevenLabs
+                settings=VoiceSettings(stability=0.5, similarity_boost=0.8)
+            ),
+            api_key=ELEVENLABS_API_KEY
+        )
 
-# إجراء مكالمة باستخدام Twilio
+        # 🔹 حفظ وتشغيل الصوت
+        with open("output.mp3", "wb") as f:
+            f.write(audio_data)
+
+        sound = AudioSegment.from_file("output.mp3", format="mp3")
+        play(sound)
+
+    except Exception as e:
+        print(f"❌ خطأ في تحويل النص إلى صوت: {e}")
+
+# ✅ دالة إجراء مكالمة باستخدام Twilio
 def make_call(customer_number, text):
-    client = Client(twilio_sid, twilio_token)
+    client = Client(TWILIO_SID, TWILIO_TOKEN)
     call = client.calls.create(
         twiml=f'<Response><Say voice="alice">{text}</Say></Response>',
         to=customer_number,
-        from_=twilio_phone
+        from_=TWILIO_PHONE
     )
-    print(f"تم إجراء المكالمة بنجاح! معرف المكالمة: {call.sid}")
+    print(f"📞 تم إجراء المكالمة بنجاح! معرف المكالمة: {call.sid}")
 
-# تجربة البوت
+# ✅ تجربة البوت
 if __name__ == "__main__":
     user_input = input("أدخل سؤالك: ")
     response = get_ai_response(user_input)
+    print(f"🤖 رد الذكاء الاصطناعي: {response}")
+    
+    # تشغيل الصوت
     text_to_speech(response)
+    
+    # تجربة الاتصال (أدخل رقم هاتفك المصري الصحيح)
     make_call("+201234567890", response)
