@@ -1,0 +1,8 @@
+{
+    "build": {
+      "baseImage": "python:3.9",
+      "preBuild": "pip install -r requirements.txt"
+    },
+    "start": "python bot.py"
+  }
+  
