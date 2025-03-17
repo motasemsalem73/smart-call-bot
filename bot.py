@@ -1,6 +1,6 @@
 import os
 import openai
-from elevenlabs import ElevenLabs
+from elevenlabs import generate
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
 from pydub import AudioSegment
@@ -30,13 +30,10 @@ def get_ai_response(user_input):
 # ✅ دالة تحويل النص إلى صوت باستخدام ElevenLabs (تم تعديلها بالكامل)
 def text_to_speech(text):
     try:
-        # 🔹 إنشاء كائن ElevenLabs
-        elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-
-        # 🔹 توليد الصوت باستخدام الصوت المصري الذي اخترته
-        audio_data = elevenlabs_client.text_to_speech(
+        audio_data = generate(
             text=text,
-            voice_id="UR972wNGq3zluze0LoIp"  # ✅ ID الصوت المصري من موقع ElevenLabs
+            voice="UR972wNGq3zluze0LoIp",  # ✅ ID الصوت المصري من موقع ElevenLabs
+            api_key=ELEVENLABS_API_KEY
         )
 
         # 🔹 حفظ الصوت وتشغيله
@@ -49,6 +46,7 @@ def text_to_speech(text):
 
     except Exception as e:
         print(f"❌ خطأ في تحويل النص إلى صوت: {e}")
+
 
 # ✅ دالة إجراء مكالمة باستخدام Twilio
 def make_call(customer_number, text):
