@@ -64,7 +64,7 @@ def make_call(customer_number, text):
 
 # ✅ تجربة البوت
 if __name__ == "__main__":
-    user_input = input("أدخل سؤالك: ")
+    user_input = "مرحبا، ما هي خدماتك؟"  # مثال لاختبار الكود بدون إدخال يدوي
     response = get_ai_response(user_input)
     print(f"🤖 رد الذكاء الاصطناعي: {response}")
     
