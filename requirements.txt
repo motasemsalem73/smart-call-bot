@@ -1,8 +1,7 @@
-openai>=1.0.0
 firebase-admin
 twilio
 pydub
 elevenlabs
 python-dateutil
 mistralai
-"mistralai" 
+mistralai
