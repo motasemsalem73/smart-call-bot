@@ -1,6 +1,5 @@
+mistralai
 firebase-admin
 twilio
 pydub
 elevenlabs
-python-dateutil
-mistralai==0.4.2

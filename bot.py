@@ -1,6 +1,7 @@
 import os
 import json
-from mistralai import Mistral
+from mistralai.client import MistralClient
+from mistralai.models.chat_completion import ChatMessage
 from elevenlabs.client import ElevenLabs
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
@@ -22,13 +23,12 @@ db = firestore.client()
 
 # ✅ استدعاء Mistral API للرد على المستخدم
 def get_ai_response(user_input):
-    client = Mistral(api_key=os.getenv("MISTRAL_API_KEY"))
+    client = MistralClient(api_key=MISTRAL_API_KEY)
     response = client.chat(
         model="mistral-tiny",
-        messages=[{"role": "user", "content": user_input}]
+        messages=[ChatMessage(role="user", content=user_input)]
     )
-    return response['choices'][0]['message']['content']
-
+    return response.choices[0].message.content
 
 # ✅ تحويل النص إلى صوت باستخدام ElevenLabs
 def text_to_speech(text):
