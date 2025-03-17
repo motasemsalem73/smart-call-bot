@@ -1,6 +1,6 @@
 import os
 import openai
-from elevenlabs.client import ElevenLabs
+from elevenlabs import ElevenLabs
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
 from pydub import AudioSegment
