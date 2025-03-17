@@ -14,7 +14,11 @@ TWILIO_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE = os.getenv("TWILIO_PHONE_NUMBER")
 
 # ✅ إعداد Firebase
-cred = credentials.Certificate("firebase_credentials.json")
+import json
+
+firebase_credentials = json.loads(os.getenv("FIREBASE_CREDENTIALS_JSON"))
+cred = credentials.Certificate(firebase_credentials)
+
 initialize_app(cred)
 db = firestore.client()
 
