@@ -1,6 +1,6 @@
 import os
 import openai
-from elevenlabs import Voice, VoiceSettings, generate
+from elevenlabs.client import ElevenLabs
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
 from pydub import AudioSegment
@@ -27,17 +27,16 @@ def get_ai_response(user_input):
     )
     return response["choices"][0]["message"]["content"]
 
-# ✅ دالة تحويل النص إلى صوت باستخدام ElevenLabs
+# ✅ دالة تحويل النص إلى صوت باستخدام ElevenLabs (تم تعديلها)
 def text_to_speech(text):
     try:
+        # 🔹 إنشاء كائن ElevenLabs
+        elevenlabs_client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
+
         # 🔹 توليد الصوت باستخدام الصوت المصري الذي اخترته
-        audio_data = generate(
+        audio_data = elevenlabs_client.text_to_speech(
             text=text,
-            voice=Voice(
-                voice_id="UR972wNGq3zluze0LoIp",  # استبدل بـ ID الصوت المصري من موقع ElevenLabs
-                settings=VoiceSettings(stability=0.5, similarity_boost=0.8)
-            ),
-            api_key=ELEVENLABS_API_KEY
+            voice="UR972wNGq3zluze0LoIp"  # ✅ ID الصوت المصري من موقع ElevenLabs
         )
 
         # 🔹 حفظ وتشغيل الصوت
