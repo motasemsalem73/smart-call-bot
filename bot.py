@@ -41,25 +41,28 @@ def get_ai_response(user_input):
         return "عذرًا، حدث خطأ أثناء معالجة طلبك."
 
 
+from elevenlabs import ElevenLabs
+
 # ✅ تحويل النص إلى صوت باستخدام ElevenLabs
 def text_to_speech(text):
     try:
-        audio_data = generate(
+        elevenlabs = ElevenLabs(api_key=ELEVENLABS_API_KEY)
+        audio = elevenlabs.text_to_speech.convert(
             text=text,
-            voice="UR972wNGq3zluze0LoIp",  # ✅ صوت اللهجة المصرية
-            api_key=ELEVENLABS_API_KEY
+            voice_id="UR972wNGq3zluze0LoIp"  # ✅ صوت اللهجة المصرية
         )
 
-        # 🔹 حفظ الصوت وتشغيله
+        # 🔹 حفظ وتشغيل الصوت
         file_path = "output.mp3"
         with open(file_path, "wb") as f:
-            f.write(audio_data)
+            f.write(audio)
 
         sound = AudioSegment.from_file(file_path, format="mp3")
         play(sound)
 
     except Exception as e:
         print(f"❌ خطأ في تحويل النص إلى صوت: {e}")
+
 
 
 # ✅ إجراء مكالمة باستخدام Twilio
