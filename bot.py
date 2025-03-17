@@ -1,6 +1,7 @@
 import os
+import json
 import openai
-from elevenlabs import generate
+from elevenlabs import ElevenLabs
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
 from pydub import AudioSegment
@@ -14,30 +15,27 @@ TWILIO_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE = os.getenv("TWILIO_PHONE_NUMBER")
 
 # ✅ إعداد Firebase
-import json
-
 firebase_credentials = json.loads(os.getenv("FIREBASE_CREDENTIALS_JSON"))
 cred = credentials.Certificate(firebase_credentials)
-
 initialize_app(cred)
 db = firestore.client()
 
-# ✅ دالة استدعاء GPT-4 للرد على المستخدم
+# ✅ استدعاء GPT-4 باستخدام OpenAI API الجديدة
 def get_ai_response(user_input):
-    response = openai.ChatCompletion.create(
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    response = client.chat.completions.create(
         model="gpt-4-turbo",
-        messages=[{"role": "user", "content": user_input}],
-        api_key=OPENAI_API_KEY
+        messages=[{"role": "user", "content": user_input}]
     )
-    return response["choices"][0]["message"]["content"]
+    return response.choices[0].message.content
 
-# ✅ دالة تحويل النص إلى صوت باستخدام ElevenLabs (تم تعديلها بالكامل)
+# ✅ تحويل النص إلى صوت باستخدام ElevenLabs API الجديدة
 def text_to_speech(text):
     try:
-        audio_data = generate(
+        elevenlabs = ElevenLabs(api_key=ELEVENLABS_API_KEY)
+        audio_data = elevenlabs.text_to_speech.generate(
             text=text,
-            voice="UR972wNGq3zluze0LoIp",  # ✅ ID الصوت المصري من موقع ElevenLabs
-            api_key=ELEVENLABS_API_KEY
+            voice_id="UR972wNGq3zluze0LoIp"  # ✅ صوت اللهجة المصرية
         )
 
         # 🔹 حفظ الصوت وتشغيله
@@ -51,16 +49,18 @@ def text_to_speech(text):
     except Exception as e:
         print(f"❌ خطأ في تحويل النص إلى صوت: {e}")
 
-
-# ✅ دالة إجراء مكالمة باستخدام Twilio
+# ✅ إجراء مكالمة باستخدام Twilio
 def make_call(customer_number, text):
-    client = Client(TWILIO_SID, TWILIO_TOKEN)
-    call = client.calls.create(
-        twiml=f'<Response><Say voice="alice">{text}</Say></Response>',
-        to=customer_number,
-        from_=TWILIO_PHONE
-    )
-    print(f"📞 تم إجراء المكالمة بنجاح! معرف المكالمة: {call.sid}")
+    try:
+        client = Client(TWILIO_SID, TWILIO_TOKEN)
+        call = client.calls.create(
+            twiml=f'<Response><Say voice="alice">{text}</Say></Response>',
+            to=customer_number,
+            from_=TWILIO_PHONE
+        )
+        print(f"📞 تم إجراء المكالمة بنجاح! معرف المكالمة: {call.sid}")
+    except Exception as e:
+        print(f"❌ خطأ في إجراء المكالمة: {e}")
 
 # ✅ تجربة البوت
 if __name__ == "__main__":
