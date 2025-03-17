@@ -27,7 +27,7 @@ def get_ai_response(user_input):
     )
     return response["choices"][0]["message"]["content"]
 
-# ✅ دالة تحويل النص إلى صوت باستخدام ElevenLabs (تم تعديلها)
+# ✅ دالة تحويل النص إلى صوت باستخدام ElevenLabs (تم تعديلها بالكامل)
 def text_to_speech(text):
     try:
         # 🔹 إنشاء كائن ElevenLabs
@@ -36,14 +36,15 @@ def text_to_speech(text):
         # 🔹 توليد الصوت باستخدام الصوت المصري الذي اخترته
         audio_data = elevenlabs_client.text_to_speech(
             text=text,
-            voice="UR972wNGq3zluze0LoIp"  # ✅ ID الصوت المصري من موقع ElevenLabs
+            voice_id="UR972wNGq3zluze0LoIp"  # ✅ ID الصوت المصري من موقع ElevenLabs
         )
 
-        # 🔹 حفظ وتشغيل الصوت
-        with open("output.mp3", "wb") as f:
+        # 🔹 حفظ الصوت وتشغيله
+        file_path = "output.mp3"
+        with open(file_path, "wb") as f:
             f.write(audio_data)
 
-        sound = AudioSegment.from_file("output.mp3", format="mp3")
+        sound = AudioSegment.from_file(file_path, format="mp3")
         play(sound)
 
     except Exception as e:
@@ -69,4 +70,4 @@ if __name__ == "__main__":
     text_to_speech(response)
     
     # تجربة الاتصال (أدخل رقم هاتفك المصري الصحيح)
-    make_call("+201234567890", response)
+    make_call("+201062606098", response)

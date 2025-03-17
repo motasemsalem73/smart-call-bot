@@ -1,7 +1,7 @@
 openai
 elevenlabs==0.2.27
+pydub
 twilio
 firebase-admin
 pydantic
-pydub
 python-dateutil
