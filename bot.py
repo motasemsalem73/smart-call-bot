@@ -24,7 +24,7 @@ db = firestore.client()
 def get_ai_response(user_input):
     client = openai.OpenAI(api_key=OPENAI_API_KEY)
     response = client.chat.completions.create(
-        model="gpt-4-turbo",
+        model="gpt-4o",   # استبدل بـ gpt-3.5-turbo إذا لزم الأمر
         messages=[{"role": "user", "content": user_input}]
     )
     return response.choices[0].message.content
