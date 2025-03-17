@@ -1,5 +1,5 @@
 openai
-elevenlabs
+elevenlabs==0.2.27
 twilio
 firebase-admin
 pydantic
