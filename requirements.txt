@@ -3,5 +3,4 @@ twilio
 pydub
 elevenlabs
 python-dateutil
-mistralai
-mistralai
+mistralai==0.4.2
