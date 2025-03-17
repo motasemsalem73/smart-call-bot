@@ -1,7 +1,7 @@
 import os
 import json
 import requests  # استيراد requests لاستخدام API مباشرة
-from elevenlabs.client import ElevenLabs
+from elevenlabs import generate, play
 from twilio.rest import Client
 from firebase_admin import credentials, firestore, initialize_app
 from pydub import AudioSegment
@@ -44,10 +44,10 @@ def get_ai_response(user_input):
 # ✅ تحويل النص إلى صوت باستخدام ElevenLabs
 def text_to_speech(text):
     try:
-        elevenlabs = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-        audio_data = elevenlabs.text_to_speech.generate(
+        audio_data = generate(
             text=text,
-            voice="UR972wNGq3zluze0LoIp"  # ✅ صوت اللهجة المصرية
+            voice="UR972wNGq3zluze0LoIp",  # ✅ صوت اللهجة المصرية
+            api_key=ELEVENLABS_API_KEY
         )
 
         # 🔹 حفظ الصوت وتشغيله
@@ -60,6 +60,7 @@ def text_to_speech(text):
 
     except Exception as e:
         print(f"❌ خطأ في تحويل النص إلى صوت: {e}")
+
 
 # ✅ إجراء مكالمة باستخدام Twilio
 def make_call(customer_number, text):
@@ -84,4 +85,4 @@ if __name__ == "__main__":
     text_to_speech(response)
 
     # تجربة الاتصال (أدخل رقم هاتفك المصري الصحيح)
-    make_call("+201062606098", response)
+    make_call("+201144582089", response)
