@@ -49,7 +49,7 @@ def text_to_speech(text):
         elevenlabs = ElevenLabs(api_key=ELEVENLABS_API_KEY)
         audio_stream = elevenlabs.text_to_speech.convert(
             text=text,
-            voice_id="UR972wNGq3zluze0LoIp"  # ✅ صوت اللهجة المصرية
+            voice_id="IES4nrmZdUBHByLBde0P"  # ✅ صوت اللهجة المصرية
         )
 
         # 🔹 تحويل الـ Generator إلى Bytes
